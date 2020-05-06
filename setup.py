@@ -5,7 +5,7 @@ from setuptools import setup
 here = os.path.abspath(os.path.dirname(__file__))
 
 requires = [
-    'pandas==0.23.4',
+    'pandas>=0.22.0',
     'beautifulsoup4==4.9.0',
 ]
 
