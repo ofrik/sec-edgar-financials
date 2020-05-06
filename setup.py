@@ -6,8 +6,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 requires = [
     'pandas==0.23.4',
-    'requests==2.20.0',
-    'bs4==0.0.1',
+    'beautifulsoup4==4.9.0',
 ]
 
 test_requirements = [
@@ -34,7 +33,7 @@ setup(
     license=about['__license__'],
     packages=['edgar'],
     keywords=['sec', 'edgar', 'financials', 'stock', 'fundamental', 'analysis'],
-    python_requires="==3.7",
+    python_requires=">=3.6.10",
     install_requires=requires,
     tests_require=test_requirements,
     classifiers=[
