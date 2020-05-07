@@ -1,9 +1,9 @@
 from bs4 import BeautifulSoup
 from edgar.dtd import DTD
 
-
 # according to the EDGAR SGML specs, DOCUMENT.TEXT has the following children
 attrs = ['pdf', 'xml', 'xbrl', 'table', 'caption', 'stub', 'column', 'footnotes_section']
+
 
 class DocumentText:
     '''
@@ -18,8 +18,9 @@ class DocumentText:
         :param data: a dictionary of parsed SGML DOCUMENT.TEXT;
             keys are tags and values are data as strings
         '''
+        if isinstance(data, str) and data.startswith("<XBRL>") and data.endswith("</XBRL>"):
+            data = {"<XML>": data[len("<XBRL>") + 1:-(len("</XBRL>") + 1)]}
         self.data = data
-
         # use data to set attributes
         for attr in attrs:
             tag = getattr(self.dtd, attr).tag

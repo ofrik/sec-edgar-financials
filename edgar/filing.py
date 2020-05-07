@@ -159,7 +159,10 @@ class Filing:
             short_name = short_name.get_text().lower()
             # we want to make sure it matches, up until the end of the text
             if short_name == report_short_name.lower():
-                filename = report.find('htmlfilename').get_text()
+                try:
+                    filename = report.find('htmlfilename').get_text()
+                except:
+                    filename = None
                 return filename
         # print(f'could not find anything for ShortName {report_short_name.lower()}')
         return None
