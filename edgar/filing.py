@@ -5,7 +5,7 @@ from edgar.requests_wrapper import GetRequest
 from edgar.document import Document
 from edgar.sgml import Sgml
 from edgar.dtd import DTD
-from edgar.financials import get_financial_report
+from edgar.financials import get_financial_report, get_old_financial_report
 from datetime import datetime
 
 FILING_SUMMARY_FILE = 'FilingSummary.xml'
@@ -72,7 +72,7 @@ class Filing:
         # {filename:Document}
         self.documents = {}
         for document_raw in sgml.map[dtd.sec_document.tag][dtd.document.tag]:
-            document = Document(document_raw)
+            document = Document(document_raw)  # TODO fix issues with parse information from before 2000
             self.documents[document.filename] = document
         if dtd.acceptance_datetime.tag in sgml.map[dtd.sec_document.tag][dtd.sec_header.tag]:
             acceptance_datetime_element = sgml.map[dtd.sec_document.tag][dtd.sec_header.tag][
@@ -99,19 +99,27 @@ class Filing:
         '''
         financial_data = []
 
-        for names in self._get_statement(statement_short_names):
-            short_name = names[0]
-            filename = names[1]
-            # print('Getting financial data for {0} (filename: {1})'
-            #       .format(short_name, filename))
-            financial_html_text = self.documents[filename].doc_text.data
+        try:
+            for names in self._get_statement(statement_short_names):
+                short_name = names[0]
+                filename = names[1]
+                # print('Getting financial data for {0} (filename: {1})'
+                #       .format(short_name, filename))
+                financial_html_text = self.documents[filename].doc_text.data
 
-            financial_report = get_financial_report(self.company, self.date_filed, financial_html_text)
+                financial_report = get_financial_report(self.company, self.date_filed, financial_html_text)
 
-            if get_all:
-                financial_data.append(financial_report)
-            else:
-                return financial_report
+                if get_all:
+                    financial_data.append(financial_report)
+                else:
+                    return financial_report
+        except:
+            # parse old formatting
+            for filename in self.documents:
+                if "10" in filename:
+                    financial_html_text = self.documents[filename].doc_text.data
+                    financial_report = get_old_financial_report(self.company, self.date_filed, financial_html_text)
+                    return [financial_report]
 
         return financial_data
 
@@ -131,7 +139,7 @@ class Filing:
                 if filename is not None:
                     statement_names += [(short_name, filename)]
         else:
-            print('No financial documents in this filing')
+            raise Exception("Old formatting")
 
         if len(statement_names) == 0:
             print('No financial documents could be found. Likely need to \
