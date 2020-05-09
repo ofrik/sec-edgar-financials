@@ -72,7 +72,7 @@ class Filing:
         # {filename:Document}
         self.documents = {}
         for document_raw in sgml.map[dtd.sec_document.tag][dtd.document.tag]:
-            document = Document(document_raw)  # TODO fix issues with parse information from before 2000
+            document = Document(document_raw)
             self.documents[document.filename] = document
         if dtd.acceptance_datetime.tag in sgml.map[dtd.sec_document.tag][dtd.sec_header.tag]:
             acceptance_datetime_element = sgml.map[dtd.sec_document.tag][dtd.sec_header.tag][
@@ -98,7 +98,6 @@ class Filing:
         Returns financial data used for processing 10-Q and 10-K documents
         '''
         financial_data = []
-
         try:
             for names in self._get_statement(statement_short_names):
                 short_name = names[0]
@@ -113,12 +112,14 @@ class Filing:
                     financial_data.append(financial_report)
                 else:
                     return financial_report
-        except:
+        except Exception as e:
             # parse old formatting
             for filename in self.documents:
-                if "10" in filename:
+                if self.documents[filename].type in ["10-K", "10-Q"]:
                     financial_html_text = self.documents[filename].doc_text.data
-                    financial_report = get_old_financial_report(self.company, self.date_filed, financial_html_text)
+                    months = 12 if self.documents[filename].type == "10-K" else 3
+                    financial_report = get_old_financial_report(self.company, self.date_filed, financial_html_text,
+                                                                months=months)
                     return [financial_report]
 
         return financial_data
@@ -142,8 +143,7 @@ class Filing:
             raise Exception("Old formatting")
 
         if len(statement_names) == 0:
-            print('No financial documents could be found. Likely need to \
-            update constants in edgar.filing.Statements.')
+            raise Exception("Couldn't do it")
 
         return statement_names
 

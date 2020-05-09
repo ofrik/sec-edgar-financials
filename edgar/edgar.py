@@ -210,7 +210,7 @@ def _get_filing_info(cik='', forms=[], year='', quarter=''):
 
     # using master.idx so it's sorted by cik and we can use binary search
     url = '{}{}{}{}'.format(FULL_INDEX_URL, year, quarter, MASTER_IDX)
-    print('getting {} filing info from {}'.format(forms, url))
+    # print('getting {} filing info from {}'.format(forms, url))
 
     response = GetRequest(url).response
     text = response.text

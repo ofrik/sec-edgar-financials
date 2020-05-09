@@ -7,12 +7,12 @@ here = os.path.abspath(os.path.dirname(__file__))
 requires = [
     'pandas>=0.22.0',
     'beautifulsoup4==4.9.0',
+    'word2number==1.1'
 ]
 
 test_requirements = [
     'pytest==4.0.1'
 ]
-
 
 about = {}
 with open(os.path.join(here, 'edgar', '__version__.py'), mode='r', encoding='utf-8') as f:
